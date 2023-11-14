@@ -61,4 +61,23 @@ describe("Test operating wih DevWorkspace Flattened Devfile:", () => {
       "web-nodejs-sample",
     ]);
   });
+
+  test("should include dependentProjects", async () => {
+    env.DEVWORKSPACE_FLATTENED_DEVFILE = path.join(
+      __dirname,
+      "_data",
+      "dependentProjects.devworkspace.yaml"
+    );
+
+    const devfile = new FlattenedDevfile();
+    const projects = await devfile.getProjects();
+
+    expect(projects).toBeDefined();
+    expect(projects.map((project) => project.name)).toStrictEqual([
+      "che-code",
+      "che-devfile-registry",
+      "web-nodejs-sample",
+      "dependent-project",
+    ]);
+  });
 });

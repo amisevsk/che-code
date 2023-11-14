@@ -31,6 +31,27 @@ const TEST_JSON = `{
 \t]
 }`;
 
+const TEST_DEPENDENTPROJECTS_JSON = `{
+\t"folders": [
+\t\t{
+\t\t\t"name": "che-code",
+\t\t\t"path": "/tmp/projects/che-code"
+\t\t},
+\t\t{
+\t\t\t"name": "che-devfile-registry",
+\t\t\t"path": "/tmp/projects/che-devfile-registry"
+\t\t},
+\t\t{
+\t\t\t"name": "web-nodejs-sample",
+\t\t\t"path": "/tmp/projects/web-nodejs-sample"
+\t\t},
+\t\t{
+\t\t\t"name": "dependent-project",
+\t\t\t"path": "/tmp/projects/dependent-project"
+\t\t}
+\t]
+}`;
+
 describe("Test generating VS Code Workspace file:", () => {
   beforeEach(() => {
     Object.assign(fs, {
@@ -107,6 +128,33 @@ describe("Test generating VS Code Workspace file:", () => {
     expect(writeFileMock).toBeCalledWith(
       "/tmp/projects/.code-workspace",
       TEST_JSON
+    );
+  });
+
+  test("should create .code-workspace file including dependentProjects", async () => {
+    env.PROJECTS_ROOT = "/tmp/projects";
+
+    env.DEVWORKSPACE_FLATTENED_DEVFILE = path.join(
+      __dirname,
+      "_data",
+      "dependentProjects.devworkspace.yaml"
+    );
+
+    const pathExistsMock = jest.fn();
+    const writeFileMock = jest.fn();
+
+    Object.assign(fs, {
+      pathExists: pathExistsMock,
+      writeFile: writeFileMock,
+    });
+
+    const codeWorkspace = new CodeWorkspace();
+    await codeWorkspace.generate();
+
+    expect(pathExistsMock).toBeCalled();
+    expect(writeFileMock).toBeCalledWith(
+      "/tmp/projects/.code-workspace",
+      TEST_DEPENDENTPROJECTS_JSON
     );
   });
 

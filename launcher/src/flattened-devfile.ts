@@ -14,6 +14,7 @@ import * as jsYaml from "js-yaml";
 
 export interface Devfile {
   projects: Project[];
+  dependentProjects: Project[];
   components: Component[];
 }
 
@@ -91,6 +92,9 @@ export class FlattenedDevfile {
 
   async getProjects(): Promise<Project[]> {
     const devfile = await this.getDevfile();
-    return devfile.projects;
+    if (!devfile.dependentProjects) {
+      return devfile.projects;
+    }
+    return devfile.projects.concat(devfile.dependentProjects);
   }
 }
